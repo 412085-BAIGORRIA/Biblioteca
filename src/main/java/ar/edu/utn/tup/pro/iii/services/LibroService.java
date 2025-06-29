@@ -12,5 +12,6 @@ public interface LibroService {
     List<LibroDtoResponse> getLibros();
     List<LibroDtoResponse> getLibrosByDisponible(boolean disponible);
     List<LibroDtoResponse> getLibrosByCategoria(String categoria);
+    LibroDtoResponse getLibroById(Long id);
 
 }

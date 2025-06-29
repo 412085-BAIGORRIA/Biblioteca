@@ -1,12 +1,17 @@
 package ar.edu.utn.tup.pro.iii.services.impl;
 
 import ar.edu.utn.tup.pro.iii.dtos.LibroDtoResponse;
+import ar.edu.utn.tup.pro.iii.dtos.PrestamoDtoCreate;
 import ar.edu.utn.tup.pro.iii.dtos.PrestamoDtoResponse;
 import ar.edu.utn.tup.pro.iii.dtos.UsuarioDtoResponse;
+import ar.edu.utn.tup.pro.iii.entities.LibroEntity;
 import ar.edu.utn.tup.pro.iii.entities.PrestamoEntity;
 import ar.edu.utn.tup.pro.iii.entities.UsuarioEntity;
 import ar.edu.utn.tup.pro.iii.repositories.PrestamoRepository;
+import ar.edu.utn.tup.pro.iii.services.LibroService;
 import ar.edu.utn.tup.pro.iii.services.PrestamoService;
+import ar.edu.utn.tup.pro.iii.services.UsuarioService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,6 +23,8 @@ import java.util.List;
 public class PrestamoServiceImpl implements PrestamoService {
 
     private final PrestamoRepository prestamoRepository;
+    private final LibroService libroService;
+    private final UsuarioService usuarioService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -49,6 +56,29 @@ public class PrestamoServiceImpl implements PrestamoService {
         List<PrestamoEntity> prestamosEntities = prestamoRepository.findAll();
 
         return toDto(prestamosEntities);
+    }
+
+    @Override
+    public PrestamoDtoResponse savePrestamo(PrestamoDtoCreate prestamo) {
+
+        UsuarioDtoResponse usuarioDtoResponse = usuarioService.getUsuarioById(prestamo.getUsuarioId());
+        LibroDtoResponse libroDtoResponse = libroService.getLibroById(prestamo.getLibroId());
+
+        if(usuarioDtoResponse != null && libroDtoResponse != null) {
+            PrestamoEntity prestamoEntity = PrestamoEntity.builder()
+                    .usuario(modelMapper.map(usuarioDtoResponse, UsuarioEntity.class))
+                    .libro(modelMapper.map(libroDtoResponse, LibroEntity.class))
+                    .fechaPrestamo(prestamo.getFechaPrestamo())
+                    .estado("ACTIVO")
+                    .build();
+
+            PrestamoEntity savedPrestamoEntity = prestamoRepository.save(prestamoEntity);
+
+            return modelMapper.map(savedPrestamoEntity, PrestamoDtoResponse.class);
+        } else {
+            throw new EntityNotFoundException("Usuario o Libro no encontrado");
+        }
+
     }
 
 

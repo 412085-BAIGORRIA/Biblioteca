@@ -1,5 +1,6 @@
 package ar.edu.utn.tup.pro.iii.controllers;
 
+import ar.edu.utn.tup.pro.iii.dtos.PrestamoDtoCreate;
 import ar.edu.utn.tup.pro.iii.dtos.PrestamoDtoResponse;
 import ar.edu.utn.tup.pro.iii.services.PrestamoService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,11 @@ public class PrestamoController {
         } else {
             return ResponseEntity.ok(prestamoService.getPrestamos());
         }
+    }
+
+    @PostMapping("/prestamos")
+    public ResponseEntity<PrestamoDtoResponse> createPrestamo(@RequestBody PrestamoDtoCreate prestamo){
+        return ResponseEntity.ok(prestamoService.savePrestamo(prestamo));
     }
 
 }

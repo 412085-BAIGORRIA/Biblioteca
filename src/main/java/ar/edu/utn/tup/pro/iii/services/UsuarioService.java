@@ -9,5 +9,6 @@ import java.util.List;
 public interface UsuarioService {
 
     List<UsuarioDtoResponse> getUsuarios();
+    UsuarioDtoResponse getUsuarioById(Long id);
 
 }

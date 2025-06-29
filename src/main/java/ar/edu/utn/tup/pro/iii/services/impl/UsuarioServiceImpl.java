@@ -7,6 +7,7 @@ import ar.edu.utn.tup.pro.iii.services.UsuarioService;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<UsuarioDtoResponse> getUsuarios() {
@@ -33,6 +35,14 @@ public class UsuarioServiceImpl implements UsuarioService {
         ).toList();
 
         return usuarioDtoResponses;
+
+    }
+
+    @Override
+    public UsuarioDtoResponse getUsuarioById(Long id) {
+
+        UsuarioEntity usuarioEntity = usuarioRepository.findById(id).orElse(null);
+        return modelMapper.map(usuarioEntity, UsuarioDtoResponse.class);
 
     }
 

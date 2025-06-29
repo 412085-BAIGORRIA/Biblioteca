@@ -5,6 +5,7 @@ import ar.edu.utn.tup.pro.iii.entities.LibroEntity;
 import ar.edu.utn.tup.pro.iii.repositories.LibroRepository;
 import ar.edu.utn.tup.pro.iii.services.LibroService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 public class LibroServiceImpl implements LibroService {
 
     private final LibroRepository libroRepository;
+    private final ModelMapper modelMapper;
 
 
     @Override
@@ -71,6 +73,15 @@ public class LibroServiceImpl implements LibroService {
         ).toList();
 
         return librosDtoResponses;
+
+    }
+
+    @Override
+    public LibroDtoResponse getLibroById(Long id) {
+
+        LibroEntity libroEntity = libroRepository.findById(id).orElse(null);
+
+        return modelMapper.map(libroEntity, LibroDtoResponse.class);
 
     }
 }
