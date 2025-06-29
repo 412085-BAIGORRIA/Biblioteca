@@ -14,8 +14,12 @@ import ar.edu.utn.tup.pro.iii.services.UsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -64,6 +68,10 @@ public class PrestamoServiceImpl implements PrestamoService {
         UsuarioDtoResponse usuarioDtoResponse = usuarioService.getUsuarioById(prestamo.getUsuarioId());
         LibroDtoResponse libroDtoResponse = libroService.getLibroById(prestamo.getLibroId());
 
+        if(!libroDtoResponse.isDisponible()){
+            throw new ResponseStatusException(HttpStatusCode.valueOf(409), "Libro no disponible");
+        }
+
         if(usuarioDtoResponse != null && libroDtoResponse != null) {
             PrestamoEntity prestamoEntity = PrestamoEntity.builder()
                     .usuario(modelMapper.map(usuarioDtoResponse, UsuarioEntity.class))
@@ -72,12 +80,29 @@ public class PrestamoServiceImpl implements PrestamoService {
                     .estado("ACTIVO")
                     .build();
 
+            prestamoEntity.getLibro().setDisponible(false);
+
             PrestamoEntity savedPrestamoEntity = prestamoRepository.save(prestamoEntity);
 
             return modelMapper.map(savedPrestamoEntity, PrestamoDtoResponse.class);
         } else {
             throw new EntityNotFoundException("Usuario o Libro no encontrado");
         }
+
+    }
+
+    @Override
+    public PrestamoDtoResponse getPrestamoById(Long id) {
+
+        PrestamoEntity prestamoEntity = prestamoRepository.getReferenceById(id);
+
+        prestamoEntity.setEstado("DEVUELTO");
+        prestamoEntity.setFechaDevolucion(LocalDate.now());
+        prestamoEntity.getLibro().setDisponible(true);
+
+        PrestamoEntity savedPrestamoEntity = prestamoRepository.save(prestamoEntity);
+
+        return modelMapper.map(savedPrestamoEntity, PrestamoDtoResponse.class);
 
     }
 

@@ -14,5 +14,6 @@ public interface PrestamoService {
     List<PrestamoDtoResponse> getPrestamoDtoByEstado(String estado);
     List<PrestamoDtoResponse> getPrestamos();
     PrestamoDtoResponse savePrestamo(PrestamoDtoCreate prestamo);
+    PrestamoDtoResponse getPrestamoById(Long id);
 
 }

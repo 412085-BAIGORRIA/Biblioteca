@@ -4,6 +4,7 @@ import ar.edu.utn.tup.pro.iii.dtos.LibroDtoResponse;
 import ar.edu.utn.tup.pro.iii.entities.LibroEntity;
 import ar.edu.utn.tup.pro.iii.repositories.LibroRepository;
 import ar.edu.utn.tup.pro.iii.services.LibroService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,10 @@ public class LibroServiceImpl implements LibroService {
     public LibroDtoResponse getLibroById(Long id) {
 
         LibroEntity libroEntity = libroRepository.findById(id).orElse(null);
+
+        if(libroEntity == null){
+            throw new EntityNotFoundException("Libro no encontrado");
+        }
 
         return modelMapper.map(libroEntity, LibroDtoResponse.class);
 

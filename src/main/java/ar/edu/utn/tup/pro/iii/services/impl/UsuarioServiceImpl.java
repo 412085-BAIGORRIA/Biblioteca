@@ -4,6 +4,7 @@ import ar.edu.utn.tup.pro.iii.dtos.UsuarioDtoResponse;
 import ar.edu.utn.tup.pro.iii.entities.UsuarioEntity;
 import ar.edu.utn.tup.pro.iii.repositories.UsuarioRepository;
 import ar.edu.utn.tup.pro.iii.services.UsuarioService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioDtoResponse getUsuarioById(Long id) {
 
         UsuarioEntity usuarioEntity = usuarioRepository.findById(id).orElse(null);
+
+        if(usuarioEntity == null){
+            throw new EntityNotFoundException("Usuario no encontrado");
+        }
+
         return modelMapper.map(usuarioEntity, UsuarioDtoResponse.class);
 
     }
